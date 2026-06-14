@@ -18,29 +18,36 @@ FRigUnit_FindFootTargetPositionNode_Execute()
 
 		FVector EndTrace = FootTransform.GetLocation() + VelocityScaled + RigSpaceCalculatedVelocity * ((CycleLengthInSeconds - SwingTime) / 2) - FVector(0, 0, 40);
 
+		Start = StartTrace;
+		End = EndTrace;
+		FVector HitLocation = FRigUnit_FindFootTargetPositionNode::GetHit(Hierarchy, Start, End, 10.5f);
 
-		FRigUnit_SphereTraceWorld TraceNode = FRigUnit_SphereTraceWorld();
-		TraceNode.Start = StartTrace;
-		TraceNode.End = EndTrace;
-		TraceNode.Radius = 0.5f;
-		TraceNode.Execute();
 
 		FRigUnit_AimBoneMath AimMathNode = FRigUnit_AimBoneMath();
 		FTransform InputTransform = FTransform::Identity;
-		InputTransform.SetLocation(TraceNode.HitLocation);
+		InputTransform.SetLocation(HitLocation);
 		AimMathNode.InputTransform = InputTransform;
 		AimMathNode.Primary.Axis = FVector(0.f, 0.f, 1.f);
 		AimMathNode.Primary.Kind = EControlRigVectorKind::Direction;
+		AimMathNode.Primary.Target = /*TraceNode.HitNormal*/ FVector(0.f, 0.f, 1.f);
 		AimMathNode.Secondary.Axis = FVector(0.f, 0.f, 1.f);
 		AimMathNode.Secondary.Kind = EControlRigVectorKind::Direction;
+		AimMathNode.Secondary.Target = /*TraceNode.HitNormal*/ FVector(0.f, 0.f, 1.f);
 		AimMathNode.Execute();
+		//End = TraceNode.HitLocation;
 
-
-		FTransform ResultingTransform = FTransform::Identity;
-		ResultingTransform.SetLocation(TraceNode.HitLocation - VelocityScaled + FVector(0, 0, FootGroundOffset));
-		ResultingTransform.SetRotation(AimMathNode.Result.GetRotation());
-
-		
-		FootTargetLocation = ResultingTransform;
+		FootTargetLocation = HitLocation - VelocityScaled + FVector(0, 0, FootGroundOffset);
+		FootTargetRotation = AimMathNode.Result.GetRotation();
 	}
+}
+
+FVector FRigUnit_FindFootTargetPositionNode::GetHit(URigHierarchy* Hierarchy, FVector Start, FVector End, float Radius)
+{
+	FRigUnit_SphereTraceByTraceChannel TraceNode = FRigUnit_SphereTraceByTraceChannel();
+	TraceNode.Start = Start;
+	TraceNode.End = End;
+	TraceNode.Radius = Radius;
+
+	TraceNode.Execute();
+	return TraceNode.HitLocation;
 }

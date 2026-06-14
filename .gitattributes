@@ -1,0 +1,4 @@
+*.uasset filter=lfs diff=lfs merge=lfs -text
+Content/Light_Foliage*.uasset filter=lfs diff=lfs merge=lfs -text
+Content/GENERATED*.uasset filter=lfs diff=lfs merge=lfs -text
+Content/LowpolyRealisticRock*.uasset filter=lfs diff=lfs merge=lfs -text

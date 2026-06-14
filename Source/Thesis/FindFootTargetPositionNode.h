@@ -43,5 +43,18 @@ struct THESIS_API FRigUnit_FindFootTargetPositionNode : public FRigUnitMutable
     float FootGroundOffset;
 
     UPROPERTY(meta = (Output))
-    FTransform FootTargetLocation;
+    FVector FootTargetLocation;
+
+    UPROPERTY(meta = (Output))
+    FQuat FootTargetRotation;
+
+    UPROPERTY(meta = (Output))
+    FVector Start;
+
+    UPROPERTY(meta = (Output))
+    FVector End;
+
+
+    static FVector GetHit(URigHierarchy* Hierarchy, FVector Start, FVector End, float Radius);
 };
+
